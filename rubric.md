@@ -97,6 +97,44 @@ The agent must avoid all of the following:
 - **Do not restate the input verbatim.** The agent's job is to synthesize
   and structure, not to reformat raw notes.
 
+## 6. Classification rules
+
+When the agent classifies notes from the raw input into PROGRESS, RISK,
+DECISION, or NOISE categories, it must follow these rules to ensure
+consistent output across runs:
+
+- **One note = one classification item.** Treat each distinct note as
+  its own classification. Do not combine two notes unless they refer to
+  the same event, deliverable, or outcome. If two items have different
+  dates, different stakeholders, or different outcomes, they are
+  separate items.
+- **Cross-functional touchpoints are usually PROGRESS.** Meetings or
+  check-ins with governance bodies (e.g., COREMAP), legal partners
+  (e.g., e-Discovery), IT leadership, and stakeholder leadership
+  (e.g., KM Team Lead, ECD leadership) should be classified as PROGRESS
+  when they result in alignment, information sharing, or a concrete
+  outcome — even if no single deliverable shipped.
+- **Internal team check-ins are usually NOISE.** Routine standups,
+  internal 1:1s, and team coordination syncs are NOISE unless they
+  produced a material outcome that affects delivery.
+- **Vague sentiment statements are NOISE.** Phrases like "they seem
+  happy" or "things are going well" without specific outcomes should be
+  classified as NOISE. If the user wants to surface stakeholder
+  sentiment as PROGRESS, they should provide concrete evidence — for
+  example, a specific quote, decision, or metric.
+- **DECISION means leadership input, approval, or escalation — not
+  routine approvals.** A DECISION item requires someone above the user
+  in the reporting chain to weigh in (e.g., the KM Team Lead, ECD
+  leadership, COREMAP, or another governance body). Routine approvals
+  that are part of the user's own role — invoice approvals, vendor SOW
+  reviews, standard sign-offs — are not DECISIONs. If the user can
+  resolve it themselves with their normal authority, it is NOISE (if
+  administrative) or RISK (if there's a concern about cost, quality,
+  or timing).
+- **When a note is genuinely ambiguous between two categories**, the
+  agent should use the clarify step (per Section 4) and ask the user
+  rather than guessing.
+
 ---
 
 *Last updated: April 2026*
