@@ -1,27 +1,32 @@
 # Status Report Agent
 
-A small agentic workflow built with Claude Code that turns messy weekly
-project notes into executive-ready status updates.
-
-<TO FILL IN: one-paragraph summary of what the agent does, who it's for,
-and what makes it interesting. Written for a non-technical reader.>
+A small agentic workflow built with Claude Code that turns messy weekly project notes into executive-ready status updates. The project demonstrates how knowledge management and governance principles translate to agentic AI design — through rubrics that define quality, human-in-the-loop checkpoints that preserve accountability, and traceable reasoning that makes the agent's decisions auditable. It solves a real problem most project leads face: spending 45–90 minutes every Monday morning transforming raw notes into something polished enough to send to leadership.
 
 ---
 
 ## Why this exists
 
-<TO FILL IN: the problem. Team leads and project managers spend 45-90
-minutes every week transforming raw notes into polished status updates
-for leadership. This agent does the first draft in 30 seconds. Frame
-the reader's pain point first, then the agent as a response to it.>
+Team leads and project managers do the same quiet ritual every week: they start drafting a status update on Friday afternoon when they're trying to wrap up the week, and they finish it on Monday morning when they're trying to start a new one. The drafting isn't hard, exactly — but it pulls focus across the worst possible hours of the week, when everything else is either ending or beginning.
+
+The work is mostly mechanical: gathering scattered notes, pasted Slack threads, and meeting fragments; deciding what's worth surfacing; flagging risks; calling out decisions the reader needs to make. A human can do all of this. They just lose two productive hours of their week to it, every week.
+
+The Status Report Agent absorbs the mechanical part. It reads the messy weekly notes, classifies what matters, drafts the executive-ready update following a defined rubric, and asks for clarification when input is ambiguous. The human still owns the substance — what to escalate, how to frame a decision, when to send — but no longer has to own the formatting, the structuring, and the first-pass triage.
 
 ---
 
 ## What it does
 
-<TO FILL IN: plain-language description of the 4-step workflow -
-classify, clarify, draft, self-check. Keep this short. Visual diagram
-or screenshot would help here.>
+The agent runs a four-step workflow against a single file of raw weekly notes:
+
+**1. Classify.** It reads each line of the notes and tags it as PROGRESS, RISK, DECISION, or NOISE based on the rubric. Routine chatter and team-internal detail get dropped. Cross-functional touchpoints, blockers, and items requiring escalation get surfaced.
+
+**2. Clarify.** When a note is genuinely ambiguous — vague sentiment, unclear severity, missing context — the agent asks the human a focused question rather than guessing. The human answers, and the agent continues. This step is what keeps the agent honest about its own limits.
+
+**3. Draft.** Using the classified items, the agent writes a status update following the rubric: four required sections, severity tags on every risk, under 300 words, no preamble, no padding. The output matches the format an executive reader expects week to week.
+
+**4. Self-check.** The agent reviews its own draft against the rubric and surfaces any judgment calls the human should verify before sending — for example, severity ratings inferred from urgency signals rather than explicit input, or items that were dropped to stay under the bullet cap.
+
+The output is a markdown file the human reviews, edits, and sends. The agent never sends anything itself.
 
 ---
 
