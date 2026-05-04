@@ -1,6 +1,6 @@
 # Status Report Agent
 
-A small agentic workflow built with Claude Code that turns messy weekly project notes into executive-ready status updates. The project demonstrates how knowledge management and governance principles translate to agentic AI design — through rubrics that define quality, human-in-the-loop checkpoints that preserve accountability, and traceable reasoning that makes the agent's decisions auditable. It solves a real problem most project leads face: spending 45–90 minutes every Monday morning transforming raw notes into something polished enough to send to leadership.
+A small agentic workflow built with Claude Code that turns messy weekly project notes into executive-ready status updates. The project demonstrates how knowledge management and governance principles translate to agentic AI design — through rubrics that define quality, human-in-the-loop checkpoints that preserve accountability, and traceable reasoning that makes the agent's decisions auditable. It solves a real problem most project leads face: losing two productive hours of their week — split across Friday afternoon and Monday morning — to transforming raw notes into something polished enough to send to leadership.
 
 ---
 
@@ -32,49 +32,49 @@ The output is a markdown file the human reviews, edits, and sends. The agent nev
 
 ## Why it's agentic, not just a prompt
 
-<TO FILL IN: explanation of what makes this agentic rather than a
-one-shot prompt. Multi-step decision-making, self-checking against a
-rubric, asking for human clarification when input is ambiguous. This
-section is for readers who are evaluating technical depth.>
+A prompt produces output in a single shot: input goes in, response comes out, the work is done. An agent, in the sense the term is used in 2026, does something different — it makes decisions across multiple steps, evaluates its own work against criteria, and changes behavior based on what it finds.
+
+This project meets that bar through four concrete behaviors:
+
+**Multi-step reasoning over single-shot output.** The workflow runs four sequential steps (classify, clarify, draft, self-check) rather than producing a final draft in one pass. Each step has a defined input, a defined output, and a defined purpose. The reasoning between steps is what separates this from a clever prompt.
+
+**Self-evaluation against a rubric.** After drafting, the agent reads its own output against the rubric (word count, severity tags, section order, anti-patterns) and revises before returning. A prompt produces text and stops. This agent grades itself.
+
+**Confidence-aware decision-making.** When the agent assigns severity tags, it distinguishes between calls grounded in explicit input ("blocked 10 days, will push next batch" → clearly HIGH) and calls inferred from softer urgency signals ("might need 2 more weeks" → inferred MEDIUM). It surfaces the inferred ones to the human for verification. Most agent demos don't track the difference between what they know and what they're guessing.
+
+**Targeted human-in-the-loop checkpoints.** When input is genuinely ambiguous — vague sentiment, missing context, unclear severity — the agent pauses and asks a focused question rather than producing its best guess. This is a design constraint layered on top of agentic capability, not a replacement for it. The agent could guess; it's been instructed not to.
+
+The result is an agent that reads, decides, evaluates, and asks — and stops short of executing on the human's behalf. That last boundary is deliberate, and the next section explains why.
 
 ---
 
 ## Design decisions
 
-This section captures the judgment calls behind the agent. These are the
-design decisions that reflect my operations and knowledge management
-background.
+This section captures the judgment calls behind the agent. They reflect my background in knowledge operations, governance, and AI enablement in regulated environments — and they're the reason this project behaves the way it does.
 
 ### Human-in-the-loop by design
 
-<TO FILL IN: Human in 3 places - input stage (human provides notes),
-clarify stage (agent asks human before proceeding on ambiguous items),
-output stage (human reviews draft before sending; agent never
-auto-sends). The agent is a drafting assistant with guardrails, not an
-autonomous decision-maker.>
+The agent never operates without a human in three specific places: the human provides the input notes, the human answers any clarifying questions the agent raises, and the human reviews the final draft before sending. The agent never auto-sends, never escalates on its own, and never assumes silence is consent.
+
+This isn't a default I inherited; it's a deliberate constraint. In large-scale content migrations, automation can move and classify files quickly, but a human still has to confirm record types, access controls, retention rules, and legal hold exceptions — because the cost of a wrong call is compliance exposure, not just inconvenience. The same principle applies whenever AI-generated content touches regulated workflows: the agent can support, but qualified humans have to validate. This agent is built to that standard.
 
 ### Rubric-driven behavior
 
-<TO FILL IN: The rubric file defines what "good" looks like and is the
-source of truth for the agent's behavior. Reflects my judgment based on
-operations experience. In a real enterprise deployment, the rubric would
-be co-designed with stakeholders and validated against historical
-examples. Note that the rubric is a plain markdown file, editable by
-non-engineers - PMs, ops leads, domain experts - without code changes.>
+The agent's quality criteria live in `rubric.md` — a plain markdown file that defines required sections, format rules, severity tags, and classification logic. The agent reads the rubric at runtime. The code itself contains no judgment about what a "good" status update looks like; that judgment is fully externalized.
+
+This separation is intentional. It means the people who actually understand the work — PMs, operations leads, domain experts — can edit how the agent behaves without touching code. Quality governance stays where it belongs: with the people accountable for it.
 
 ### Output to a local file, not auto-sent
 
-<TO FILL IN: The agent writes the final draft to a local markdown file.
-The human reviews and decides when/where to send. This is a deliberate
-low-tech choice for human control, portability (no OAuth setup), and
-matching real user behavior - people want drafts they can tweak, not
-auto-sent emails.>
+When the agent finishes drafting, it writes the output to a local markdown file. The human opens the file, reviews it, edits anything that needs editing, and decides where it goes. The agent does not write to email, Slack, a Google Doc, or any other delivery surface.
+
+This is a deliberate low-tech choice. Auto-send pipelines look impressive in demos, but they introduce risk that has nothing to do with the agent's actual job: bad output reaches its audience faster. Keeping the human in the delivery path is what makes the agent safe to use on real executive-facing content.
 
 ### Clarification is a governance feature
 
-<TO FILL IN: When input is ambiguous, the agent asks for clarification
-rather than guessing. This prevents hallucination and forces human
-accountability for the final content.>
+When input is genuinely ambiguous — a vague sentiment ("they seem happy"), a missing detail (no severity signal), a piece of context the agent can't infer — the agent stops and asks the human a focused question rather than guessing.
+
+This is often described as a usability feature. It's actually a governance feature. Hallucination doesn't happen because models are careless; it happens because they're trained to produce plausible output regardless of input quality. The clarify step interrupts that default. By forcing the agent to ask, the project keeps accountability for content quality with the human, where it belongs.
 
 ---
 
