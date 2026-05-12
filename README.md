@@ -80,9 +80,64 @@ This is often described as a usability feature. It's actually a governance featu
 
 ## How to run it
 
-<TO FILL IN: step-by-step instructions. Clone the repo, install Claude
-Code, authenticate, run the agent against one of the samples. Should be
-simple enough that a non-engineer could follow it.>
+This is a Claude Code project. You run the agent by pasting a prompt into a Claude Code session, then telling it which input file to use. The agent reads your notes, asks clarifying questions, drafts a status report, self-checks against the rubric, and writes the final draft to a file for your review.
+
+### Prerequisites
+
+- [Claude Code](https://code.claude.com/docs/en/overview) installed
+- An Anthropic API key configured for Claude Code
+- A terminal application (Terminal on macOS, any equivalent on Linux/Windows)
+
+### 1. Clone the repo
+
+```bash
+git clone https://github.com/heeya002/status-report-agent.git
+cd status-report-agent
+```
+
+### 2. Start Claude Code in the project folder
+
+```bash
+claude
+```
+
+This opens a Claude Code session inside the project. The agent needs to be inside this folder so it can read `rubric.md`, your input file, and write to `outputs/`.
+
+### 3. Run the demo
+
+Copy the entire contents of `prompts/run-agent.md` and paste it into Claude Code. On a new line at the end of your paste, add:
+
+```
+Run this on samples/sample-2-blocked-week.md.
+```
+
+Press Enter. The agent will:
+
+1. Read the rubric and the input file
+2. Classify each item in the notes
+3. Ask you a numbered list of clarifying questions where the input is ambiguous (severity unclear, missing context, unclear next steps, ambiguous sentiment)
+4. Wait for your answers
+5. Draft the status report against the rubric
+6. Self-check the draft and revise if needed
+7. Write the final draft to `outputs/status-report-{today's-date}.md`
+
+A complete run takes a few minutes including the time to answer clarifying questions.
+
+### 4. Run it on your own notes
+
+Drop your weekly notes as a `.md` file into the `inputs/` folder. Then start a Claude Code session and paste the same prompt, but point at your file:
+
+```
+Run this on inputs/my-notes-2026-05-10.md.
+```
+
+The samples in `samples/` stay untouched — they're reference examples showing what good input looks like.
+
+The agent writes your draft to `outputs/status-report-{today's-date}.md` (for example, `outputs/status-report-2026-05-11.md`). Open the file in any text editor to review.
+
+### 5. See an example output
+
+`outputs/example-output-sample-2.md` is a real draft the agent produced from `samples/sample-2-blocked-week.md`. It shows what the four sections look like (This Week's Progress, Risks and Blockers, Decisions Needed, Next Week's Focus), how severity tags appear inline, and how the rubric's word-count and bullet-count constraints shape the output.
 
 ---
 
