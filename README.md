@@ -168,10 +168,21 @@ Two things to notice about how the project is laid out:
 
 ## Production extensions
 
-<TO FILL IN: a short list of how this demo would be extended for
-production use - Google Doc output, Slack approval bot, email-to-self
-for review, Airtable or Notion tracker. Signal that I understand the
-full lifecycle, not just the demo.>
+The agent writes to a local file by design, not as a limitation. Local output preserves the human-review checkpoint (the draft can't auto-send), avoids OAuth and credential setup that would slow down a portfolio demo, and stays portable across teams who use different downstream tools.
+
+In a production deployment, several extensions would make sense — each one preserving the human-review checkpoint rather than removing it.
+
+**Google Doc or SharePoint integration.** Instead of writing to a local `.md` file, the agent writes the draft into a shared Doc or SharePoint location with the ops lead as the owner. The owner reviews, edits, and decides where to send it. IT and the document platform owner partner on the integration; lifecycle and retention policies are inherited from the platform's existing governance.
+
+**Slack approval bot.** After self-check passes, the agent posts the draft into a private Slack channel where the ops lead and one or two reviewers can approve, request changes, or escalate. The bot does not send anywhere until a human clicks "approve." This adds a second human checkpoint without removing the first.
+
+**Email-to-self.** The agent sends the draft to the ops lead's own inbox as a working draft. The lead reviews, edits in their email client, and forwards to leadership when ready. Lowest-friction option; useful for teams without a shared workspace.
+
+**Tracker integration (Airtable, Notion, Jira).** Each item the agent classifies — Progress, Blocker, Decision Needed, Risk — flows into the team's existing tracker as a record with the severity tag attached. This keeps the status report in sync with the team's working data instead of being a one-off document. Ops owns the tracker schema; the agent populates it.
+
+**Multi-team rollout.** A single rubric works for one team. For multi-team deployment, each team forks the rubric to reflect their own quality criteria (different severity rules, different required sections, different anti-patterns). Central ops owns a baseline rubric; team leads maintain their own variants. The prompt stays shared; only the rubric varies.
+
+In every case, the human-review checkpoint stays. The agent drafts; a person decides what to do with the draft. That boundary is what makes the system safe to deploy at scale.
 
 ---
 
