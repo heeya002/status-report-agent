@@ -204,11 +204,14 @@ What this project *is*: a working demonstration of how an AI drafting assistant 
 
 ## About this project
 
-<TO FILL IN: one paragraph about you - your background in knowledge
-operations, digital transformation, and AI enablement. Why this project
-connects to your career direction. Link to your LinkedIn. Brief mention
-of Realatable if relevant.>
+I'm Sunny Kim, co-founder of [Realatable](https://www.realatable.io/), an AI enablement venture focused on practical, governed AI workflows for operations teams.
 
----
+I built this project to demonstrate a specific pattern: how to design an AI drafting assistant with governance baked in from the start, rather than retrofitted onto an autonomous system. The four-step workflow, the human-in-the-loop checkpoints, the rubric-as-editable-file, the local output for human review — these aren't features I added because they sounded good. They reflect a decade of operations and knowledge management work in regulated environments, where I learned that AI tools succeed or fail based on whether the people closest to the work can shape and trust them.
 
-*Built April 2026 by Sunny Kim. Feedback welcome.*
+This is a portfolio project, not a product. The repo is open for anyone who wants to read the design, fork the pattern, or critique the choices. If any of it is useful to you — as a reference, a starting point, or a counter-example — I'd like to hear about it.
+
+**Links**
+
+- Repo: [github.com/heeya002/status-report-agent](https://github.com/heeya002/status-report-agent)
+- LinkedIn: [linkedin.com/in/sunny-kim-a4b17b55](https://www.linkedin.com/in/sunny-kim-a4b17b55/)
+- Realatable: [realatable.io](https://www.realatable.io/)
