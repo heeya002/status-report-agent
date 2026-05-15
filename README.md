@@ -188,12 +188,17 @@ In every case, the human-review checkpoint stays. The agent drafts; a person dec
 
 ## What this project is not
 
-<TO FILL IN: honest scope boundaries. Not a production system. Not
-validated. Not autonomous. The rubric is my design, not co-designed
-with real stakeholders. The samples are synthetic, based on real
-project types I ran but not drawn from actual company data. These
-honesty notes are a strength, not a weakness - they signal you know the
-difference between a demo and production.>
+This is a portfolio project demonstrating a design pattern for agentic workflows with human-in-the-loop guardrails. It is not:
+
+**A production system.** The agent runs locally in a Claude Code session against a single user's notes. There is no shared deployment, no authentication, no audit logging, no usage telemetry. A real production version would require all of those, scoped by IT and legal before rollout.
+
+**A replacement for existing status reporting tools.** Teams that already have a working status report process — a template, a meeting cadence, a tracker — don't need this. The agent is most useful for teams whose notes are messy, whose status reports are inconsistent, or whose ops leads are drowning in synthesis work.
+
+**A general-purpose AI agent framework.** The four-step workflow (Classify → Clarify → Draft → Self-check) is designed for one specific task: turning weekly project notes into a status report. The same pattern could be adapted to other drafting tasks (meeting summaries, incident postmortems, customer escalation reviews), but each adaptation would need its own rubric, its own clarification logic, and its own validation against real users.
+
+**A finished product.** The rubric is opinionated and reflects my own judgment from operations experience. In a real deployment, it would be co-designed with stakeholders and validated against historical examples. The clarification questions reflect the categories I considered most material; another ops lead might prioritize differently. These are starting points, not final answers.
+
+What this project *is*: a working demonstration of how an AI drafting assistant can be built with governance baked in from the start, rather than retrofitted onto an autonomous system. The pattern is real. The implementation is a demo.
 
 ---
 
