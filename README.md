@@ -143,9 +143,26 @@ The agent writes your draft to `outputs/status-report-{today's-date}.md` (for ex
 
 ## Project structure
 
-<TO FILL IN: brief description of each file and folder - rubric.md,
-samples/, prompts/, main agent script, README. Explain why each piece
-exists.>
+```
+status-report-agent/
+├── README.md                          ← This file
+├── rubric.md                          ← Quality rubric the agent grades itself against
+├── prompts/
+│   └── run-agent.md                   ← The prompt that runs the four-step workflow
+├── samples/                           ← Demo input files showing what good input looks like
+│   ├── sample-1-clean-week.md
+│   ├── sample-2-blocked-week.md
+│   └── sample-3-decision-pending.md
+├── inputs/                            ← Where you put your own weekly notes
+└── outputs/                           ← Where the agent writes drafted status reports
+    └── example-output-sample-2.md     ← A real draft from sample-2 (see Section 6)
+```
+
+Two things to notice about how the project is laid out:
+
+**Business logic lives outside code.** The rubric and the run prompt are plain markdown files, not buried inside a script. A PM, ops lead, or domain expert can open `rubric.md` and tune the quality criteria — word counts, severity rules, anti-patterns — without touching engineering. Same for `prompts/run-agent.md`. This is deliberate: the people closest to the work should be able to shape how the agent behaves.
+
+**Source material and generated material stay separated.** `samples/` holds reference examples that ship with the repo and shouldn't be modified. `inputs/` is where users drop their own notes. `outputs/` is where drafts land. A user always knows what's theirs, what the agent produced, and what came with the project.
 
 ---
 
