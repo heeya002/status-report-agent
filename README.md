@@ -85,10 +85,13 @@ This is a Claude Code project. You run the agent by pasting a prompt into a Clau
 ### Prerequisites
 
 - [Claude Code](https://code.claude.com/docs/en/overview) installed
+- [Git](https://git-scm.com/downloads) installed (for cloning the repo)
 - An Anthropic API key configured for Claude Code
 - A terminal application (Terminal on macOS, any equivalent on Linux/Windows)
 
 ### 1. Clone the repo
+
+In your terminal application, run:
 
 ```bash
 git clone https://github.com/heeya002/status-report-agent.git
