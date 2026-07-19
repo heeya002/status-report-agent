@@ -42,6 +42,8 @@ If the input has no ambiguities, say so and skip directly to Step 3.
 
 Using the input, the user's clarifications from Step 2, and the rubric, write the status report. Follow the rubric's required section order, length limits, and tone. Apply severity tags from Step 1 (adjusted by Step 2 answers where relevant).
 
+Include every fact that is explicitly stated in the notes, even fragmentary or informally phrased ones — do not drop a stated fact out of caution. Separately, never invent or add a reason, cause, or explanatory detail that is not itself stated. If the notes say "kelly back mon," write that Kelly is back Monday — do not add an unstated reason (e.g., "from leave"). This rule targets fabricated *explanations*, not the omission of things the notes actually say. If a reason or cause seems missing but relevant, raise it in Step 2 rather than filling it in during drafting.
+
 ### Step 4 — Self-check
 
 Read your own draft against the rubric. Check for:

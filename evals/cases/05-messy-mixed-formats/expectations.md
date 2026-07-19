@@ -40,3 +40,30 @@ None — a CLARIFY response fails `correct_mode`.
 - The Priya staffing call is arguably a decision for the KM lead; either
   Risks (MEDIUM) or Decisions Needed placement is acceptable, as long as
   the 2-week window and June 30 gap are stated.
+
+## Known limitation — dual-classification gap (flagged 2026-07-19)
+
+Passes only 1/3 runs. Both failures fail `must_include` the same way:
+Site 41 gets classified as Progress only ("dept head responded, meeting
+set for 5/19...") and drops out of Risks and Blockers entirely — no
+severity tag anywhere.
+
+Unlike `04-messy-fragments` and `06-messy-scattered-info`, this is not
+an unresolved-reference problem — the input is unambiguous: "site 41:
+dept head replied!! meeting set for 5/19. until that lands, site 41
+stays out of wave 4 scope planning. drop/keep decision comes after the
+meeting — nothing needed from the KM lead yet, just flagging so it's on
+her radar. work proceeds on the other 4 sites meanwhile." That's one
+item with genuine content on both sides: real Progress (dept head
+replied, meeting scheduled) and real Risk/awareness (pending drop/keep
+decision, explicitly asked to be flagged for the KM lead's radar). A
+correct draft surfaces both. In 2 of 3 runs the agent collapses it into
+Progress only and silently drops the Risk side.
+
+This is a classification-discipline gap in Step 1 (an item can require
+entries in more than one section, and the agent isn't consistently
+doing that), not an input defect — there's nothing to tighten in
+`input.md`. It's tracked separately from the 04/06 reference-resolution
+issue and is not being fixed in this pass; a Step 1 rule requiring
+dual-classified items to appear in every section they qualify for would
+be the natural fix, out of scope here.

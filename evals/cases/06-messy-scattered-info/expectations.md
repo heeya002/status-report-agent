@@ -40,3 +40,28 @@ None — a CLARIFY response fails `correct_mode`.
   the synthesis and should fail `must_include`.
 - Bullet-length limits may force the site 44 story across two bullets;
   that is acceptable if the substance survives.
+
+## Known limitation — mis-specified input (flagged 2026-07-19)
+
+Repeated runs (5x, same prompt and input) pass 0/5. Root cause: "the
+ask: escalate to the IT lead if it's not fixed by thursday" is written
+in the Friday entry, in a note where every other date anchors to 5/22
+— "thursday" is never pinned to a date, and it's unclear whether it
+means the Thursday just passed or the following week's. Across five
+runs the agent handles this differently every time: bails to
+`MODE: CLARIFY` to ask which Thursday is meant, which fails
+`correct_mode` (2x); conflates the Thursday trigger with the 5/22 date
+into one fabricated deadline, which fails `no_invention` (1x); drops
+the Thursday trigger from the draft entirely, which fails
+`must_include` (1x); and once drafted the synthesis correctly but
+missed severity tags on two Risk bullets, which fails `severity_tags`
+and appears to be unrelated noise (1x).
+
+This is being tracked as an input defect, not a rubric or prompt
+defect, and `expected_mode` is deliberately left as `draft` rather than
+recategorized to `clarify`: this case's entire design intent is testing
+synthesis of one blocker scattered across four fragments, not testing
+date disambiguation, and moving the goalpost to `clarify` would mask
+the underlying input defect rather than fix it. The correct fix is
+pinning "thursday" to an explicit date (e.g., "by 5/21") in a future
+revision of this case's `input.md`, not changing what counts as a pass.

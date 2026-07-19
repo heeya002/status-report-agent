@@ -78,6 +78,60 @@ This is often described as a usability feature. It's actually a governance featu
 
 ---
 
+## Evaluation
+
+The agent ships with a golden-set eval harness (`evals/`) — 15 hand-built cases across five categories (clean, messy-but-complete, ambiguous, edge cases, and judgment traps), each graded by an LLM judge against nine binary gates (correct mode, section order, severity tags, word count, required facts present, forbidden content absent, no invented detail) plus four quality scores. Full harness design lives in `evals/EVAL_PLAN.md`. What follows is a real investigation the harness caught, not a hypothetical. The golden-set cases reflect my own operations judgment about what a realistic messy week looks like; in production, they'd be co-designed with stakeholders and validated against historical examples.
+
+**Baseline: 14/15.** A full run against the original prompt passed 14 of 15 cases. The one failure, `04-messy-fragments`, failed the `no_invention` gate: the agent wrote "Kelly returned from leave Monday" when the input only said "kelly back mon" — a fabricated reason bolted onto a real fact.
+
+**The fix, and the regression it caused.** I added a rule to Step 3 of the agent prompt: never infer or add reasons, causes, or details not explicitly stated in the notes. Re-running case 04 alone confirmed the fabrication was gone. But re-running the *full suite* — not just the one case — told a different story: the pass rate dropped to 10/15. The new rule had made the agent over-cautious, and it started dropping facts that genuinely *were* in the input (a confirmed "comms went out" note, an "on track, no risks" status, explicit severity framing) out of excess caution about invention. This is why the harness reruns the whole suite after any prompt change instead of just the case that motivated it — a fix scoped to one failure mode can regress others silently.
+
+I narrowed the rule to separate fabricated *causes* from omitted *stated facts* ("include every fact that is explicitly stated... never invent a reason that is not itself stated"). Re-running the full suite brought it back to 12/15.
+
+**Non-determinism.** 12/15 still wasn't clean, and the remaining failures didn't fail the same way twice. Tallying every case-run across this investigation (41 case-runs total: the baseline, both full-suite reruns, and isolated 5x reruns of the two most volatile cases) gives a cleaner picture than any single run's score:
+
+| Case | Runs | Pass | Fail |
+|---|---|---|---|
+| 01-clean-multi-project | 3 | 2 | 1 |
+| 02-clean-blocker-week | 3 | 3 | 0 |
+| 03-clean-decision-escalation | 3 | 3 | 0 |
+| 04-messy-fragments | 9 | 2 | 7 |
+| 05-messy-mixed-formats | 3 | 1 | 2 |
+| 06-messy-scattered-info | 8 | 1 | 7 |
+| 07-ambiguous-missing-status | 3 | 3 | 0 |
+| 08-ambiguous-unclear-owner | 3 | 3 | 0 |
+| 09-ambiguous-vague-blocker | 3 | 3 | 0 |
+| 10-edge-near-empty | 3 | 3 | 0 |
+| 11-edge-contradictory | 3 | 3 | 0 |
+| 12-edge-brain-dump | 3 | 2 | 1 |
+| 13-trap-colleague-venting | 3 | 3 | 0 |
+| 14-trap-salary-detail | 3 | 3 | 0 |
+| 15-trap-blame-language | 3 | 3 | 0 |
+
+10 cases passed every run. 0 cases failed every run. The other 5 split into two very different groups: `01` and `12` each wobbled once out of three runs — a single deviation consistent with ordinary sampling noise — while `04`, `05`, and `06` are genuinely unstable, failing the majority of their runs (2/9, 1/3, and 1/8 respectively). Those three get individual root-cause treatment below.
+
+**04 and 06 — unresolved references.** Running `04-messy-fragments` and `06-messy-scattered-info` five times each in isolation showed why they're unstable:
+
+- `04-messy-fragments`: **1/5 passed** in isolation. The input's regulatory-deferral note reads "...they came back asking for 3 months instead of 6" — an unresolved "they." Across five runs the agent resolved it differently each time: correctly (1x), by fabricating an attribution to "vendor" — pattern-matched from an unrelated note earlier in the same input (2x) — and by dropping an unrelated stated fact entirely (2x).
+- `06-messy-scattered-info`: **0/5 passed** in isolation. The input's escalation note reads "...if it's not fixed by thursday," written in a Friday entry where every other date anchors to 5/22 — an unresolved "which Thursday." Across five runs: the agent bailed to `MODE: CLARIFY` to ask (2x), conflated the Thursday trigger with the 5/22 date into one fabricated deadline (1x), dropped the Thursday trigger from the draft (1x), and once synthesized correctly but forgot severity tags on two bullets (1x, unrelated noise).
+
+Same prompt, same input, five different outcomes per case. The eval runner shells out to the `claude` CLI per case with no temperature or seed control, so this is expected — nothing in the harness pins sampling, and a single run's pass/fail is one draw from a distribution, not a verdict.
+
+Both cases share a shape: an unresolved pronoun or date reference in otherwise-complete input, which the agent resolves inconsistently instead of either committing to a safe reading every time or reliably flagging it. Closing it means teaching the agent to detect unresolved references, a change to Step 2 (Clarify) rather than Step 3. I deliberately didn't make that change in this pass; `prompts/run-agent.md` is left as-is beyond the narrowed no-invention rule.
+
+Both cases are flagged inline in their `expectations.md` as **mis-specified draft cases needing input repair**, not recategorized to `expected_mode: clarify`. I considered recategorizing them, but both belong to the "messy but complete" category, whose entire design intent is that messiness shouldn't trigger clarification — moving the goalposts to `clarify` would mask a real defect in the *test input* (an underspecified pronoun/date) behind a redefinition of "correct" that happens to match whatever the model already does. The more honest fix is tightening "they" and "thursday" to explicit references in a future revision of these two cases — noted inline, not yet done, since that's input-authoring work, not eval-infrastructure work.
+
+**05 — a different failure, not the same bug.** `05-messy-mixed-formats` passed only 1/3 runs, and it's tempting to lump it in with 04/06, but the evidence points somewhere else. Both of its failures fail `must_include` the same way: Site 41 gets classified as Progress only and drops out of Risks and Blockers entirely, with no severity tag. Unlike 04/06, the input here is unambiguous — "site 41: dept head replied!! meeting set for 5/19... drop/keep decision comes after the meeting — nothing needed from the KM lead yet, just flagging so it's on her radar. work proceeds on the other 4 sites meanwhile." There's no unresolved pronoun or date to misread. The item is simply dual-nature — real Progress content (dept head replied, meeting scheduled) and real Risk/awareness content (a pending decision explicitly flagged for the KM lead's radar) — and the agent inconsistently collapses it into Progress only, silently dropping the Risk side, in 2 of 3 runs.
+
+This is a **classification-discipline gap in Step 1** (an item can require entries in more than one section, and the agent isn't consistently doing that), not an input defect — there's nothing to tighten in `05`'s `input.md` the way there is in `04` or `06`. It's flagged separately in `05`'s `expectations.md` and left unfixed in this pass; the natural fix is a Step 1 rule requiring dual-classified items to appear in every section they qualify for, which is out of scope here alongside the Step 2 reference-detection fix.
+
+**Known limitations / future work:**
+- **No sampling control.** `run_evals.py` has no seed/temperature flag, so prompt-change comparisons are noisy — a single before/after run can't distinguish a real regression from a bad draw. Adding one would make comparisons like the one above apples-to-apples, and make per-case pass-rate measurement (5x reruns) cheap enough to run routinely instead of on demand.
+- **No ambiguity-flagging rule for unresolved references.** The agent currently either silently resolves an unclear pronoun/date reference or, unpredictably, bails to clarify mode. A targeted Step 2 rule — flag unresolved references explicitly rather than guessing or drafting past them — would likely fix both `04` and `06` for good, but it's scoped as future work rather than folded into this round's prompt change.
+- **No dual-classification rule.** Step 1 doesn't currently require an item with content spanning two categories (e.g., Progress + Risk) to appear in both sections. A rule enforcing that would likely fix `05`'s instability, but like the two items above, it's scoped as future work.
+
+---
+
 ## How to run it
 
 This is a Claude Code project. You run the agent by pasting a prompt into a Claude Code session, then telling it which input file to use. The agent reads your notes, asks clarifying questions, drafts a status report, self-checks against the rubric, and writes the final draft to a file for your review.

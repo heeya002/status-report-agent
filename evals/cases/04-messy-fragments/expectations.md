@@ -39,3 +39,25 @@ ambiguity.
   unless excluded content leaks.
 - The Priya/Kelly coverage note is internal team logistics — reasonable
   to drop as NOISE; its absence is not a `must_include` failure.
+
+## Known limitation — mis-specified input (flagged 2026-07-19)
+
+Repeated runs (5x, same prompt and input) pass only ~1/5 of the time.
+Root cause: "the regulatory deferral from last month, they came back
+asking for 3 months instead of 6" leaves "they" unresolved. Across runs
+the agent resolves it three different ways: correctly (1x), by
+fabricating an attribution to "vendor" — pattern-matched from the
+unrelated vendor-outage note earlier in the same input — which fails
+`no_invention` (2x), and by dropping an unrelated stated fact
+("comms went out") which fails `must_include` (2x).
+
+This is being tracked as an input defect, not a rubric or prompt defect,
+and `expected_mode` is deliberately left as `draft` rather than
+recategorized to `clarify`: this case's category (messy-complete) is
+designed to test that messiness doesn't trigger unnecessary
+clarification, and a competent human reader would resolve "they" as the
+regulatory contact without hesitation — the ambiguity is an artifact of
+underspecified phrasing, not a case that should genuinely block
+drafting. The correct fix is tightening "they" to an explicit noun
+(e.g., "the regulatory contact") in a future revision of this case's
+`input.md`, not changing what counts as a pass.
